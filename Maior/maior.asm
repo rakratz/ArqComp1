@@ -19,3 +19,29 @@ section .text
     global _start
 
 _start:
+
+primeiro_numero: 
+    mov rax, 1 ; Syswrite
+    mov rdi, 1
+    mov rsi, msg1
+    mov rdx, tam1
+    syscall
+
+    mov rax, 0 ; Sysread
+    mov rdi, 0
+    mov rsi, num1
+    mov rdx, 10
+    syscall
+
+segundo_numero: 
+    mov rax, 1 ; Syswrite
+    mov rdi, 1
+    mov rsi, msg2
+    mov rdx, tam2
+    syscall
+
+    mov rax, 0 ; Sysread
+    mov rdi, 0
+    mov rsi, num2
+    mov rdx, 10
+    syscall
