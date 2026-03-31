@@ -9,7 +9,7 @@ section .text
     global _start
 
 _start:
-    mov r8, 10          ; começa em 9 (ASCII simples)
+    mov r8, 10          ; começa em 10
 
 loop_contador:
 
