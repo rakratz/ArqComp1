@@ -1,44 +1,163 @@
 section .data
-    input_str db "123", 10 ; String "123\n" (com terminador de linha)
-    msg_original db "Valor original: "      ; Mensagem valor original
-    msg_modificado db "Valor modificado: "  ; Mensagem valor modificado
-    newline db 10, 0                        ; Nova linha
+    input_str db "123", 10
+    tam_input_str EQU $ - input_str
+
+    msg_original db "Valor original: "
+    tam_msg_original EQU $ - msg_original
+
+    msg_modificado db "Valor modificado: "
+    tam_msg_modificado EQU $ - msg_modificado
+
+    newline db 10
 
 section .bss
-    result resb 16      ; Buffer para armazenar o número convertido (string)
-    modificado resb 16  ; Buffer para armazenar o número convertido (string)
+    result resb 16
+    modificado resq 1   ; agora guarda inteiro (64 bits)
 
 section .text
     global _start
 
 _start:
 
-     ; --- Converter string "123" para inteiro ---
-    mov rsi, input_str   ; Colocar a string para converter em rsi
-    call str_to_int
+    ; --- string → int ---
+    mov rsi, input_str
+    call str_to_int          ; resultado em RAX
 
-    ; --- Encerrar o programa ---
+    ; salva valor original
+    mov [modificado], rax
+
+    ; altera valor
+    call alterar_valor       ; RAX modificado
+
+    ; salva valor modificado
+    mov [modificado], rax
+
+    ; imprime original
+    call print_original
+
+    ; imprime modificado
+    call print_modificado
+
+    ; encerra
+    call encerra_programa
+
+;---------------------------------
+; altera_valor
+;---------------------------------
+alterar_valor:
+    add rax, 10
+    sub rax, 5
+    ret
+
+;---------------------------------
+; print_original
+;---------------------------------
+print_original:
+    ; mensagem
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, msg_original
+    mov rdx, tam_msg_original
+    syscall
+
+    ; string original
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, input_str
+    mov rdx, tam_input_str
+    syscall
+
+    ret
+
+;---------------------------------
+; print_modificado
+;---------------------------------
+print_modificado:
+    ; mensagem
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, msg_modificado
+    mov rdx, tam_msg_modificado
+    syscall
+
+    ; número → string
+    mov rax, [modificado]
+    mov rdi, result
+    call int_to_str
+
+    ; imprimir número convertido
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, result
+    mov rdx, 16
+    syscall
+
+    ; nova linha
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, newline
+    mov rdx, 1
+    syscall
+
+    ret
+
+;---------------------------------
+; encerra_programa
+;---------------------------------
+encerra_programa:
     mov rax, 60
     xor rdi, rdi
     syscall
 
-;-----------------------------
-; Função: str_to_int
-; Converte de String para Int
-; Inicio da String em RSI
-; Retorna o valor em RAX
-;-----------------------------
+;---------------------------------
+; str_to_int
+; RSI → string
+; retorna em RAX
+;---------------------------------
 str_to_int:
-    xor rax, rax        ; Zera o rax para armazenar o número
-    xor rcx, rcx        ; Zera o rcx (contador)
-.loop
-    movzx rdx, byte [rsi + rcx]   ; Pega um caractere da string e salva em rdx
-    cmp rdx, 10                   ; Se for '\n' (10), termina a conversão
-    je .done                      ; Se for igual pula para .done
-    sub rdx, '0'                  ; Converte ASCII para número (0-9)
-    imul rax, rax, 10             ; Multiplica o acumulado por 10
-    add rax, rdx                  ; Adiciona um novo dígito ao resultado final
-    inc rcx                       ; Incrementa o contador, avança para próximo caractere
-    jmp .loop                     ; Vai (goto) para o loop
-.done
+    xor rax, rax
+    xor rcx, rcx
+
+.loop:
+    movzx rdx, byte [rsi + rcx]
+    cmp rdx, 10
+    je .done
+
+    sub rdx, '0'
+    imul rax, rax, 10
+    add rax, rdx
+
+    inc rcx
+    jmp .loop
+
+.done:
+    ret
+
+;---------------------------------
+; int_to_str
+; RAX → número
+; RDI → buffer destino
+;---------------------------------
+int_to_str:
+    mov rbx, 10
+    xor rcx, rcx
+
+.loop:
+    xor rdx, rdx
+    div rbx
+
+    add dl, '0'
+    push rdx
+    inc rcx
+
+    test rax, rax
+    jnz .loop
+
+.reverse:
+    pop rax
+    mov [rdi], al
+    inc rdi
+    loop .reverse
+
+    mov byte [rdi], 0
     ret
