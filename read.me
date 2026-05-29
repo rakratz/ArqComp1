@@ -1,0 +1,3 @@
+nasm -f elf64 contar_vogais.asm -o contar_vogais.o
+gcc -no-pie main.c contar_vogais.o -o programa_vogais
+./programa_vogais
