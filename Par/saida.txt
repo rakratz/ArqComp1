@@ -1,0 +1,9 @@
+19 -> IMPAR
+10 -> PAR
+15 -> IMPAR
+22 -> PAR
+33 -> IMPAR
+45 -> IMPAR
+12 -> PAR
+8 -> PAR
+3 -> IMPAR
