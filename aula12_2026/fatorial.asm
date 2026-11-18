@@ -17,14 +17,14 @@ _start:
     ; Exibir a Mensagem
     mov rax, 1 ; SysWrite
     mov rdi, 1 ; Stdout
-    mov msi, msg
+    mov rsi, msg
     mov rdx, tam_msg
     syscall
 
     ; Ler o Número
     mov rax, 0 ; SysRead
     mov rdi, 0 ; Stdin
-    mov msi, entrada
+    mov rsi, entrada
     mov rdx, 2
     syscall
 
