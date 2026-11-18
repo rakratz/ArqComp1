@@ -19,6 +19,9 @@ section .data
     resultado_msg db "Fatorial = "
     tam_resultado_msg EQU $ - resultado_msg
 
+    ; Quebra de linha (LF - Line Feed)
+    new_line db 10
+    tam_new_line EQU $ - new_line
 
 section .bss
 
@@ -122,9 +125,18 @@ mostrar:
     mov rdx, r9             ; Quantidade de bytes do resultado
     syscall
 
+    ; --------------------------------------------------------
+    ; 8. EXIBIR QUEBRA DE LINHA
+    ; --------------------------------------------------------
+
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, new_line
+    mov rdx, tam_new_line
+    syscall
 
     ; --------------------------------------------------------
-    ; 8. ENCERRAR O PROGRAMA
+    ; 9. ENCERRAR O PROGRAMA
     ; --------------------------------------------------------
 
     mov rax, 60             ; Código 60: syscall exit
